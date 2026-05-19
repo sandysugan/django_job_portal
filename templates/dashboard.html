@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - JobPortal{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">Welcome back, {{ user.username }}! 👋</div>
+      <div class="page-subtitle">
+        {% if user.role == 'job_seeker' %}Job Seeker Dashboard{% else %}Recruiter Dashboard{% endif %}
+      </div>
+    </div>
+    {% if user.role == 'job_seeker' %}
+      <a href="{% url 'job_list' %}" class="btn btn-primary">Browse All Jobs →</a>
+    {% else %}
+      <a href="{% url 'job_add' %}" class="btn btn-primary">+ Post New Job</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container">
+
+{% if user.role == 'job_seeker' %}
+  <!-- JOB SEEKER DASHBOARD -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_applied }}</div>
+      <div class="stat-label">Jobs Applied</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-number">{{ selected_count }}</div>
+      <div class="stat-label">Selected</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-number">{{ rejected_count }}</div>
+      <div class="stat-label">Rejected</div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-3 flex-wrap">
+    <a href="{% url 'job_list' %}" class="btn btn-primary btn-lg">🔍 Browse All Jobs</a>
+    <a href="{% url 'my_applications' %}" class="btn btn-outline">📄 My Applications</a>
+  </div>
+
+  {% if my_applications %}
+  <div class="card">
+    <div class="card-header">Recent Applications</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr><th>Job Title</th><th>Company</th><th>Applied On</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for app in my_applications|slice:":5" %}
+          <tr>
+            <td><strong>{{ app.job.title }}</strong></td>
+            <td>{{ app.job.company }}</td>
+            <td>{{ app.applied_at|date:"d M Y" }}</td>
+            <td><span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span></td>
+            <td><a href="{% url 'job_detail' app.job.pk %}" class="btn btn-sm btn-outline">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📭</div>
+    <h3>No applications yet</h3>
+    <p>Start applying to jobs that match your skills!</p>
+    <a href="{% url 'job_list' %}" class="btn btn-primary mt-2">Browse Jobs</a>
+  </div>
+  {% endif %}
+
+{% else %}
+  <!-- RECRUITER DASHBOARD -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_jobs }}</div>
+      <div class="stat-label">Jobs Posted</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-number">{{ total_applications }}</div>
+      <div class="stat-label">Total Applications</div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-3 flex-wrap">
+    <a href="{% url 'job_add' %}" class="btn btn-primary btn-lg">+ Post New Job</a>
+    <a href="{% url 'recruiter_jobs' %}" class="btn btn-outline">📋 Manage My Jobs</a>
+  </div>
+
+  {% if my_jobs %}
+  <div class="card">
+    <div class="card-header">Your Job Postings</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr><th>Title</th><th>Company</th><th>Location</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for job in my_jobs|slice:":5" %}
+          <tr>
+            <td><strong>{{ job.title }}</strong></td>
+            <td>{{ job.company }}</td>
+            <td>{{ job.location }}</td>
+            <td>
+              {% if job.is_active %}
+                <span class="badge badge-selected">Active</span>
+              {% else %}
+                <span class="badge badge-rejected">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'job_applications' job.pk %}" class="btn btn-sm btn-primary">Applications</a>
+              <a href="{% url 'job_edit' job.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📝</div>
+    <h3>No jobs posted yet</h3>
+    <p>Start attracting candidates by posting your first job.</p>
+    <a href="{% url 'job_add' %}" class="btn btn-primary mt-2">Post a Job</a>
+  </div>
+  {% endif %}
+{% endif %}
+
+</div>
+{% endblock %}

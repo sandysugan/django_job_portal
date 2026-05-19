@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}JobPortal - Find Your Dream Job{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <h1>Find Your Dream Job Today 🚀</h1>
+  <p>Connect talented job seekers with the best recruiters in one place</p>
+  <div class="hero-actions">
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="btn btn-white btn-lg">Go to Dashboard →</a>
+    {% else %}
+      <a href="{% url 'register' %}" class="btn btn-white btn-lg">Get Started Free</a>
+      <a href="{% url 'login' %}" class="btn btn-outline btn-lg" style="border-color:white; color:white;">Login</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="container">
+  <div class="grid grid-3 mt-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div style="font-size:3rem; margin-bottom:1rem;">🔍</div>
+        <h3>Browse Jobs</h3>
+        <p class="text-muted mt-1">Explore hundreds of job listings tailored to your skills</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body text-center">
+        <div style="font-size:3rem; margin-bottom:1rem;">🎯</div>
+        <h3>Skill Matching</h3>
+        <p class="text-muted mt-1">Our AI-powered matching shows your fit score for each job</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body text-center">
+        <div style="font-size:3rem; margin-bottom:1rem;">📈</div>
+        <h3>Track Applications</h3>
+        <p class="text-muted mt-1">Monitor all your applications in one easy dashboard</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}{{ job.title }} - JobPortal{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">{{ job.title }}</div>
+      <div class="page-subtitle">{{ job.company }} · {{ job.location }}</div>
+    </div>
+    <a href="{% url 'job_list' %}" class="btn btn-outline">← Back to Jobs</a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid grid-2">
+    <!-- LEFT: Job Details -->
+    <div>
+      <div class="card mb-2">
+        <div class="card-header">Job Details</div>
+        <div class="card-body">
+          <p><strong>🏢 Company:</strong> {{ job.company }}</p>
+          <p class="mt-1"><strong>📍 Location:</strong> {{ job.location }}</p>
+          {% if job.salary %}
+          <p class="mt-1"><strong>💰 Salary:</strong> {{ job.salary }}</p>
+          {% endif %}
+          <p class="mt-1"><strong>📅 Posted:</strong> {{ job.created_at|date:"d M Y" }}</p>
+        </div>
+      </div>
+
+      <div class="card mb-2">
+        <div class="card-header">Description</div>
+        <div class="card-body">
+          <p>{{ job.description|linebreaks }}</p>
+        </div>
+      </div>
+
+      {% if job.required_skills %}
+      <div class="card">
+        <div class="card-header">Required Skills</div>
+        <div class="card-body">
+          <div class="skills-container">
+            {% for skill in job.get_required_skills_list %}
+              <span class="skill-tag">{{ skill }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT: Actions & Score -->
+    <div>
+      {% if user.role == 'job_seeker' %}
+      <div class="card mb-2">
+        <div class="card-header">Skill Match Score</div>
+        <div class="card-body">
+          <div class="score-display">
+            <div class="score-number">{{ match_score }}%</div>
+            <div class="progress-bar-container mt-1">
+              <div class="progress-bar" style="width: {{ match_score }}%"></div>
+            </div>
+            <p class="text-muted mt-1" style="font-size:0.9rem;">
+              Your skills match {{ match_score }}% of this job's requirements
+            </p>
+          </div>
+
+          {% if matched_skills %}
+          <p class="mt-2"><strong style="color:var(--success);">✅ Matched Skills:</strong></p>
+          <div class="skills-container mt-1">
+            {% for s in matched_skills %}<span class="skill-tag matched">{{ s }}</span>{% endfor %}
+          </div>
+          {% endif %}
+
+          {% if missing_skills %}
+          <p class="mt-2"><strong style="color:var(--danger);">❌ Missing Skills:</strong></p>
+          <div class="skills-container mt-1">
+            {% for s in missing_skills %}<span class="skill-tag missing">{{ s }}</span>{% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          {% if already_applied %}
+            <p class="text-center" style="color:var(--success); font-weight:700; font-size:1.1rem;">
+              ✅ You have already applied!
+            </p>
+            <a href="{% url 'my_applications' %}" class="btn btn-outline w-100 mt-2">View My Applications</a>
+          {% else %}
+            <a href="{% url 'apply_job' job.pk %}" class="btn btn-success w-100 btn-lg">Apply for this Job</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if user.role == 'recruiter' and job.created_by == user %}
+      <div class="card">
+        <div class="card-body">
+          <p class="mb-2"><strong>Recruiter Actions</strong></p>
+          <a href="{% url 'job_applications' job.pk %}" class="btn btn-primary w-100 mb-1">View Applications</a>
+          <a href="{% url 'job_edit' job.pk %}" class="btn btn-warning w-100 mb-1">Edit Job</a>
+          <a href="{% url 'job_delete' job.pk %}" class="btn btn-danger w-100">Delete Job</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

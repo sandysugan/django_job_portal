@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}JobPortal{% endblock %}</title>
+  
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="{% url 'home' %}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="navbar-links">
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      {% if user.role == 'job_seeker' %}
+        <a href="{% url 'job_list' %}">Browse Jobs</a>
+        <a href="{% url 'my_applications' %}">My Applications</a>
+      {% else %}
+        <a href="{% url 'recruiter_jobs' %}">My Jobs</a>
+        <a href="{% url 'job_add' %}">Post Job</a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="btn-nav">Logout</a>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}" class="btn-nav">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="messages-container mt-1">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+{% block content %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Match Score - {{ job.title }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">Skill Match Score 🎯</div>
+      <div class="page-subtitle">{{ job.title }} at {{ job.company }}</div>
+    </div>
+    <a href="{% url 'job_detail' job.pk %}" class="btn btn-outline">← Job Details</a>
+  </div>
+</div>
+
+<div class="container-sm">
+  <div class="card text-center mb-3">
+    <div class="card-body" style="padding:3rem;">
+      <div class="score-number">{{ match_score }}%</div>
+      <p class="text-muted mt-1">Your profile matches this job</p>
+      <div class="progress-bar-container mt-2" style="height:18px;">
+        <div class="progress-bar" style="width: {{ match_score }}%"></div>
+      </div>
+      <p class="mt-2" style="font-size:1.1rem;">
+        {% if match_score >= 75 %}
+          🎉 <strong style="color:var(--success);">Excellent match!</strong> You're a great fit for this role.
+        {% elif match_score >= 50 %}
+          👍 <strong style="color:var(--warning);">Good match!</strong> You meet many of the requirements.
+        {% elif match_score >= 25 %}
+          📚 <strong style="color:var(--primary);">Moderate match.</strong> Consider learning some missing skills.
+        {% else %}
+          💪 <strong style="color:var(--danger);">Low match.</strong> This role may require additional skills.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  {% if matched_skills %}
+  <div class="card mb-2">
+    <div class="card-header" style="color:var(--success);">✅ Skills You Have ({{ matched_skills|length }})</div>
+    <div class="card-body">
+      <div class="skills-container">
+        {% for skill in matched_skills %}
+          <span class="skill-tag matched" style="font-size:0.9rem; padding:0.3rem 0.8rem;">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if missing_skills %}
+  <div class="card mb-3">
+    <div class="card-header" style="color:var(--danger);">❌ Skills to Learn ({{ missing_skills|length }})</div>
+    <div class="card-body">
+      <div class="skills-container">
+        {% for skill in missing_skills %}
+          <span class="skill-tag missing" style="font-size:0.9rem; padding:0.3rem 0.8rem;">{{ skill }}</span>
+        {% endfor %}
+      </div>
+      <p class="text-muted mt-2" style="font-size:0.85rem;">
+        💡 Tip: Add these skills to your profile after learning them to improve your match score!
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="d-flex gap-2">
+    <a href="{% url 'apply_job' job.pk %}" class="btn btn-success btn-lg">Apply for this Job</a>
+    <a href="{% url 'job_list' %}" class="btn btn-outline">Back to Jobs</a>
+  </div>
+</div>
+
+{% endblock %}

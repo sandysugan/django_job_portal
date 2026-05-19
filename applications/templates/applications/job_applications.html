@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Applications for {{ job.title }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">Applications: {{ job.title }}</div>
+      <div class="page-subtitle">{{ applications|length }} applicant{{ applications|length|pluralize }}</div>
+    </div>
+    <a href="{% url 'recruiter_jobs' %}" class="btn btn-outline">← My Jobs</a>
+  </div>
+</div>
+
+<div class="container">
+  {% if applications %}
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Applicant</th>
+          <th>Email</th>
+          <th>Skills</th>
+          <th>Applied On</th>
+          <th>Resume Score</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td><strong>{{ app.user.username }}</strong></td>
+          <td>{{ app.user.email }}</td>
+          <td>
+            {% if app.user.skills %}
+              <div class="skills-container">
+                {% for skill in app.user.get_skills_list %}
+                  <span class="skill-tag" style="font-size:0.7rem; padding:0.15rem 0.5rem;">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>{{ app.applied_at|date:"d M Y" }}</td>
+          <td>
+            {% with score_data=app.get_resume_score %}
+              {% if score_data %}
+                <strong style="color:var(--primary);">{{ score_data.0 }}%</strong>
+              {% else %}
+                —
+              {% endif %}
+            {% endwith %}
+          </td>
+          <td><span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span></td>
+          <td>
+            <a href="{% url 'update_status' app.pk %}" class="btn btn-sm btn-warning">Update Status</a>
+            {% if app.resume %}
+              <a href="{{ app.resume.url }}" class="btn btn-sm btn-outline" target="_blank">Resume</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📭</div>
+    <h3>No applications yet</h3>
+    <p>No one has applied to this job yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
